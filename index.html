@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tipificación de Llamadas</title>
+</head>
+<body>
+    <h2>Formulario de Tipificación de Llamadas</h2>
+    <form id="callForm">
+        <label for="agentName">Nombre de Agente:</label>
+        <input type="text" id="agentName" name="agentName" readonly>
+        <br><br>
+
+        <label for="callType">Tipo de Llamada:</label>
+        <select id="callType" name="callType" onchange="toggleAppointmentOptions()">
+            <option value="Asignacion cita">Asignación cita</option>
+            <option value="Cancelación o reprogramación de Cita">Cancelación o reprogramación de Cita</option>
+            <option value="Información Cita">Información Cita</option>
+            <option value="Información sedes Atención">Información sedes Atención</option>
+            <option value="Otro tipo de información">Otro tipo de información</option>
+        </select>
+        <br><br>
+
+        <div id="appointmentOptions" style="display: none;">
+            <label for="appointmentType">Tipo de Asignación de Cita:</label>
+            <select id="appointmentType" name="appointmentType">
+                <option value="Asignacion cita Ginecologia">Asignación cita Ginecología (incluye procedimientos)</option>
+                <option value="Asignacion Cita Pami">Asignación Cita Pami</option>
+                <option value="Asignacion Cita Pediatria">Asignación Cita Pediatría</option>
+                <option value="Asignacion Cita Cardiología">Asignación Cita Cardiología (incluye procedimientos)</option>
+                <option value="Asignacion Cita Oncología">Asignación Cita Oncología (incluye procedimientos)</option>
+            </select>
+            <br><br>
+        </div>
+
+        <label for="observations">Observaciones:</label>
+        <textarea id="observations" name="observations" maxlength="1000"></textarea>
+        <br><br>
+
+        <button type="button" onclick="saveData()">Guardar</button>
+    </form>
+
+    <h3>Estadísticas del Día</h3>
+    <div id="statistics"></div>
+
+    <br>
+    <button onclick="downloadExcel()">Descargar en Excel</button>
+
+    <script>
+        // Mostrar opciones de asignación de cita si corresponde
+        function toggleAppointmentOptions() {
+            const callType = document.getElementById('callType').value;
+            const appointmentOptions = document.getElementById('appointmentOptions');
+            appointmentOptions.style.display = callType === 'Asignacion cita' ? 'block' : 'none';
+        }
+
+        // Inicializa Firebase y define las funcionalidades de autenticación y base de datos
+        // Tu configuración de Firebase:
+        const firebaseConfig = {
+            apiKey: "AIzaSyBQqbaFLm2DRldeIU3v3RWkSX0_1vsMrWs",
+            authDomain: "tipificacion-de-llamadas.firebaseapp.com",
+            projectId: "tipificacion-de-llamadas",
+            storageBucket: "tipificacion-de-llamadas.appspot.com",
+            messagingSenderId: "738039891529",
+            appId: "1:738039891529:web:f3c6aabb640d49cbd2a198",
+            measurementId: "G-TBHSZLK7C2"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Función para guardar los datos
+        function saveData() {
+            const agentName = document.getElementById('agentName').value;
+            const callType = document.getElementById('callType').value;
+            const appointmentType = document.getElementById('appointmentType').value;
+            const observations = document.getElementById('observations').value;
+
+            db.collection("calls").add({
+                agentName: agentName,
+                callType: callType,
+                appointmentType: appointmentType,
+                observations: observations,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                alert('Datos guardados correctamente!');
+                document.getElementById('callForm').reset();
+            }).catch((error) => {
+                console.error("Error al guardar los datos: ", error);
+            });
+        }
+
+        // Aquí puedes implementar las funciones para mostrar estadísticas y descargar en Excel
+    </script>
+
+    <!-- Incluir aquí el script de Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+</body>
+</html>
